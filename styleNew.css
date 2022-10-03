@@ -30,7 +30,7 @@ body, html {
     min-width: clamp(600px, 80%, 900px);
     display: flex;
     align-items: center;
-    padding-left: 44px;
+    /*padding-left: 44px;*/
     overflow-x: scroll;
 }
 .frame::-webkit-scrollbar{

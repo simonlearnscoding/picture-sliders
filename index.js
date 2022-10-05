@@ -12,6 +12,17 @@ const nav =() => {
             const indexObj = obj[0].indexPicture
             return indexObj
         },
+        startTimer() { general.timer = setInterval( () => {this.father.moveByOne(1)}, 5000) },
+        stopTimer() {
+            console.log('Ive been called')
+            clearInterval(general.timer)
+
+            general.timer = () => { this.father.timer = setInterval( () => {this.moveByOne(1)}, 1000) }}
+        ,
+        // restartTimer() {
+            // this.stopTimer()
+            // this.startTimer()
+        // },
         moveByOne(direction) {
             const destinationObj = this.getDestinationObject(direction)
             this.scrollByArrowFunction(destinationObj)
@@ -21,13 +32,13 @@ const nav =() => {
             this.unselectAll()
             object.html.classList.add('selected')
             this.scrollMovement(object.imagereferedTo)
-            this.restartSliding()
-
         },
         scrollByReference(element) {
             this.unselectAll()
             element.classList.add('selected')
             this.scrollMovement(this.imagereferedTo)
+            // this.stopTimer()
+
         },
         unselectAll(){
             const indexPics = document.getElementsByClassName('picture-index')
@@ -40,7 +51,6 @@ const nav =() => {
                 block: 'center',
                 inline: 'center'
             })
-            this.restartSliding()
         }
     }
     return general
@@ -51,34 +61,33 @@ const Objectfactory = (HTMLElement) => {
     const obj = Object.create(nav())
     obj.id = HTMLElement.id
     obj.html = HTMLElement
-    obj.timer = nav().startSliding
     return obj
 }
 const imageSliderFactory = (HTMLElement, ) => {
     const obj = Objectfactory(HTMLElement)
-    obj.pictures = createChildren()
+    obj.pictures = createChildren(obj)
     obj.arrows = createarrows(obj)
-    obj.startSliding
     selectFirstImage()
+    obj.father = obj
+    // obj.startSliding()
+    obj.startTimer()
 
-    obj.startSliding = setInterval(() => {Slider.moveByOne(1)}, 5000),
-    obj.restartSliding = () => {
-        clearInterval(this.startSliding)
-        this.startSliding =  setInterval(() => {Slider.moveByOne(1)}, 5000)
-    }
-    obj.startSliding
+    // obj.restartSliding = () => {
+    //     clearInterval(this.startSliding)
+    //     this.startSliding =  setInterval(() => {Slider.moveByOne(1)}, 5000)
+    // }
     return obj
 
     function selectFirstImage() {
         const firstSelect = obj.pictures[0].indexPicture
         firstSelect.scrollByReference(firstSelect.html)
     }
-    function createChildren() {
+    function createChildren(father) {
         const childrenHTML = document.getElementsByClassName('picture')
         const children = []
         let counter = 0
         for (let item of childrenHTML) {
-            children.push(imageObjectFactory(item, counter))
+            children.push(imageObjectFactory(item, counter, father))
             counter +=1
         }
         return children}
@@ -90,28 +99,30 @@ const imageSliderFactory = (HTMLElement, ) => {
         return arrowObj
     }
 }
-const imageObjectFactory = (HTMLElement, indexNumber) => {
+const imageObjectFactory = (HTMLElement, indexNumber, father) => {
     const obj = Objectfactory(HTMLElement)
     obj.id = indexNumber
-    obj.indexPicture = createReference(obj, indexNumber)
+    obj.father = father
+    obj.indexPicture = createReference(obj, indexNumber, father)
 
-    function createReference(obj, indexNumber) {
+    function createReference(obj, indexNumber, father) {
         const container = document.getElementById('index-container')
         const element = document.createElement('div')
         element.id = indexNumber;
         element.classList.add('picture-index')
         container.appendChild(element);
         const object = ObjectReferenceFactory(element, obj);
+        object.father = father
         return object
     }
 
     return obj
 }
-const ObjectReferenceFactory = (HTMLelement, referenced) => {
+const ObjectReferenceFactory = (HTMLElement, referenced) => {
     const obj = Object.create(nav())
-    Object.assign(obj, Objectfactory(HTMLelement))
+    Object.assign(obj, Objectfactory(HTMLElement))
     obj.imagereferedTo = referenced.html
-    HTMLelement.addEventListener('click', () => {obj.scrollByReference(obj.html)})
+    HTMLElement.addEventListener('click', () => {obj.scrollByReference(obj.html)})
     return obj
 }
 const ArrowFactory = (element, father) => {
@@ -130,7 +141,6 @@ const ArrowFactory = (element, father) => {
 SliderElement = document.getElementById('container')
 const Slider = imageSliderFactory(SliderElement)
 console.log(Slider)
-
 
 
 
